@@ -156,46 +156,5 @@ with tab2:
     st.subheader("🗝️ 추천 마케팅 전략")
     st.write(f"{strategy}")
 
-# 사용자의 선택에 따라 사용할 수 있는 추가 기능 구현(고객 데이터를 입력하면 해당 고객이 어떤 분류에 속하는 고객인지 알려주는 기능)===============================
-
-    # 고객 예시 데이터 입력 (사용자가 궁금하면 사용하는 선택사항)
-    st.subheader("고객 특성별 세그먼트 예측하기")
-    with st.expander("고객 특성별 세그먼트 예측하기 (선택)"):
-        age = st.number_input('고객 나이', min_value=18, max_value=69, value=30)
-        gender = st.selectbox('성별', options=['Male','Female'])
-        income = st.number_input('월소득(달러)', min_value=30004, max_value=149973, value=50000)
-        spending_score = st.number_input('지출 점수 (0~100)', min_value=0, max_value=100, value=50)
-        membership_years = st.number_input('멤버십 가입연수', min_value=1, max_value=10, value=3)
-        purchase_freq = st.number_input('연간 구매 빈도', min_value=1, max_value=50, value=10)
-        preferred_category = st.selectbox('선호 카테고리', options=['Groceries','Sports','Clothing','Home & Garden','Electronics'])
-
-        # 자연어로 되어있는 변수들 인코딩 (gender, category)
-        gender_map = {'Male':0, 'Female':1}
-        category_map = {'Groceries':0, 'Sports':1, 'Clothing':2, 'Home & Garden':3, 'Electronics':4}
-        input_dict = {
-            'age': age,
-            'gender': gender_map[gender],
-            'income': income,
-            'spending_score': spending_score,
-            'membership_years': membership_years,
-            'purchase_frequency': purchase_freq,
-            'preferred_category': category_map[preferred_category]
-        }
-        # income은 12로 나누어서 연소득 대신 월소득으로
-        input_df = pd.DataFrame([input_dict])
-        input_df['income'] = input_df['income'] / 12
-
-        # 스케일링 (age, income)
-        input_df[['age','income']] = scaler.transform(input_df[['age','income']])
-
-        # MLP 모델을 통해 고객 세그먼트 예측
-        X_tensor = torch.tensor(input_df.values, dtype=torch.float32)
-        with torch.no_grad():
-            output = mlp_model(X_tensor)
-            pred_class = torch.argmax(output, dim=1).item()
-        pred_seg_kor = segment2kor[pred_class]
-        st.markdown(f"**예상 고객 세그먼트: {pred_seg_kor}**")
-        st.markdown(f"**추천 전략** \n {marketing_strategies[pred_class]}")
-
 st.markdown("---")
 st.caption("2025 Business Programming Group4")
